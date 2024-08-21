@@ -1,0 +1,4 @@
+/.venv/
+/google-services.json
+/.idea/
+/.buildozer
