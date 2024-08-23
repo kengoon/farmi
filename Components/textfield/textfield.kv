@@ -1,0 +1,76 @@
+<TextField>:
+    adaptive_height: True
+    spacing: "10dp"
+    TextInput:
+        id: field
+        text: root.text
+        write_tab: root.write_tab
+        hint_text: root.hint_text
+        size_hint_y: None
+        height: self.minimum_height
+        background_active: ""
+        background_color: 0, 0, 0, 0
+        disabled: root.field_disabled
+        background_normal: ""
+        font_size: root.font_size
+        focus: root.focus
+        foreground_color: "white" if root.theme_cls.theme_style == "Dark" else root.foreground_color
+        disabled_foreground_color: root.disabled_foreground_color
+        cursor_color: root.cursor_color or root.theme_cls.primaryColor
+        keyboard_suggestions: root.keyboard_suggestions
+        multiline: root.multiline
+        halign: root.halign
+        input_filter: root.input_filter
+        input_type: root.input_type
+        password: root.password
+        password_mask: root.password_mask
+        pos_hint: {"center_y": .5}
+        on_text_validate: root.dispatch("on_text_validate")
+        on_text: root.text = args[1]
+        on_focus: root.focus = args[1]
+
+
+<TagTextField>:
+    adaptive_height: True
+    spacing: "5dp"
+    orientation: "vertical"
+    MDLabel:
+        text: root.tag
+        adaptive_height: True
+    TextField:
+        theme_icon_color: root.theme_icon_color
+        hint_text: root.hint_text
+        icon_left: root.icon_left
+        icon_right: root.icon_right
+        line_width: root.line_width
+        line_color: root.line_color
+        focus: root.focus
+        foreground_color: "white" if self.theme_cls.theme_style == "Dark" else root.foreground_color
+        disabled_foreground_color: root.disabled_foreground_color
+        md_bg_color: root.bg_color
+        keyboard_suggestions: root.keyboard_suggestions
+        text: root.text
+        padding: root.field_padding
+        radius: root.radius
+        password: root.password
+        input_filter: root.input_filter
+        input_type: root.input_type
+        password_mask: root.password_mask
+        focus_type: root.focus_type
+        icon_left_color: root.icon_left_color
+        icon_right_color: root.icon_right_color
+        multiline: root.multiline
+        focus_line_color: root.focus_line_color
+        focus_shadow_color: root.focus_shadow_color
+        write_tab: root.write_tab
+        icon_left_font_style: root.icon_left_font_style
+        icon_right_font_style: root.icon_right_font_style
+        font_size: root.font_size
+        on_text: root.text = args[1]
+        on_focus: root.focus = args[1]
+        on_text_validate: root.dispatch("on_text_validate")
+        on_icon_left_release: root.dispatch("on_icon_left_release")
+        on_icon_right_release: root.dispatch("on_icon_right_release")
+
+
+#        on_focus: self.line_color = app.theme_cls.primaryColor if args[1] else [.7, .7, .7, 1]

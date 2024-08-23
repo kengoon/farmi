@@ -1,0 +1,63 @@
+<MDNavigationItemIcon>
+    canvas.before:
+        Clear
+        Color:
+            rgba:
+                ( \
+                ( \
+                self.theme_cls.secondaryContainerColor \
+                if not self.parent.parent.indicator_color else \
+                self.parent.parent.indicator_color \
+                ) \
+                if self.parent.parent.active else \
+                self.theme_cls.transparentColor \
+                ) \
+                if self.parent else self.theme_cls.transparentColor
+        RoundedRectangle:
+            radius: [dp(16),]
+            size:
+                ( \
+                (self.parent.parent._selected_region_width, dp(32)) \
+                ) \
+                if self.parent else (0, dp(32))
+            pos:
+                ( \
+                (self.center_x - self.parent.parent._selected_region_width / 2, \
+                self.center_y - dp(16)) \
+                ) \
+                if self.parent else (0, 0)
+
+<MDCustomNavigationBar>
+#    canvas:
+#        Color:
+#            rgba: 1, 1, 1, 1
+#        Rectangle:
+#            size: self.size
+#            pos: self.pos
+#            texture: Gradient.vertical(self.md_bg_color[:3] + [.8], self.md_bg_color)
+
+<MDCustomTopAppBar>:
+#    on_touch_down: print(self.md_bg_color)
+#    canvas.before:
+#        Color:
+#            rgba: 1, 1, 1, 1
+#        Rectangle:
+#            size: self.size
+#            pos: self.pos
+#            texture:
+#                Gradient.vertical(
+#                self.theme_cls.surfaceContainerColor[:3] + [.8],
+#                self.theme_cls.surfaceContainerColor)
+
+<DisturbButton>
+    padding: "30dp", "20dp"
+    adaptive_height: True
+    MDButton:
+        theme_width: "Custom"
+        size_hint_x: 1
+        height: "56dp"
+#        style: "filled"
+        MDButtonText:
+            text: root.text
+            font_style: "Title"
+            pos_hint: {"center_x": .5, "center_y": .5}
