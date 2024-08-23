@@ -1,0 +1,213 @@
+<HomeScreenView>
+    name: 'home screen'
+    MDBoxLayout:
+        orientation: "vertical"
+        MDBoxLayout:
+            adaptive_height: True
+            spacing: "20dp"
+            padding: "20dp"
+            orientation: "vertical"
+            MDCard:
+                theme_bg_color: "Custom"
+                md_bg_color: self.theme_cls.transparentColor
+                adaptive_height: True
+                spacing: "10dp"
+                MDIconButton:
+                    icon: "google-maps"
+                MDLabel:
+                    text: "Awkuzu Farms"
+                    adaptive_height: True
+                    pos_hint: {"center_y": .5}
+            MDCard:
+                adaptive_height: True
+                radius: "30dp"
+                padding: "20dp"
+                spacing: "20dp"
+                orientation: "vertical"
+                MDBoxLayout:
+                    adaptive_height: True
+                    MDBoxLayout:
+                        adaptive_height: True
+                        orientation: "vertical"
+                        MDLabel:
+                            text: "18°C"
+                            adaptive_height: True
+                            font_style: "Headline"
+                            theme_line_height: "Custom"
+                            line_height: 1
+                        MDLabel:
+                            adaptive_size: True
+                            text: "Cloudy"
+                            role: "medium"
+                    MDRelativeLayout:
+                        size_hint: None, None
+                        height: icon.height + dp(10)
+                        width: icon.width + dp(10)
+                        pos_hint: {"center_y": .5}
+                        MDIcon:
+                            icon: "white-balance-sunny"
+                            theme_font_size: "Custom"
+                            font_size: "32sp"
+                            pos_hint: {"top": 1, "right": 1}
+                            theme_icon_color: "Custom"
+                            icon_color: "gold"
+                        MDIcon:
+                            id: icon
+                            icon: "cloud"
+                            theme_font_size: "Custom"
+                            font_size: "32sp"
+                            theme_icon_color: "Custom"
+                            icon_color: self.theme_cls.onPrimaryColor[:3] + [.8]
+                MDBoxLayout:
+                    adaptive_height: True
+                    MDBoxLayout:
+                        adaptive_height: True
+                        orientation: "vertical"
+                        spacing: "5dp"
+                        MDLabel:
+                            text: "Humidity"
+                            adaptive_height: True
+                            halign: "center"
+                            role: "medium"
+                        MDChip:
+                            type: "suggestion"
+                            pos_hint: {"center_x": .5}
+                            theme_line_color: "Custom"
+                            line_color: self.theme_cls.transparentColor
+                            pos_hint: {"center_x": .5}
+                            MDChipText:
+                                text: "Good"
+                    MDBoxLayout:
+                        adaptive_height: True
+                        orientation: "vertical"
+                        spacing: "5dp"
+                        MDLabel:
+                            text: "Soil Moisture"
+                            adaptive_height: True
+                            halign: "center"
+                            role: "medium"
+                        MDChip:
+                            type: "suggestion"
+                            pos_hint: {"center_x": .5}
+                            theme_line_color: "Custom"
+                            line_color: self.theme_cls.transparentColor
+                            pos_hint: {"center_x": .5}
+                            MDChipText:
+                                text: "Good"
+                    MDBoxLayout:
+                        adaptive_height: True
+                        orientation: "vertical"
+                        spacing: "5dp"
+                        MDLabel:
+                            text: "Precipitation"
+                            adaptive_height: True
+                            halign: "center"
+                            role: "medium"
+                        MDChip:
+                            type: "suggestion"
+                            pos_hint: {"center_x": .5}
+                            theme_line_color: "Custom"
+                            line_color: self.theme_cls.transparentColor
+                            pos_hint: {"center_x": .5}
+                            MDChipText:
+                                text: "Good"
+        MDCard:
+            radius: "40dp", "40dp", 0, 0
+            orientation: "vertical"
+            padding: "20dp"
+            spacing: "20dp"
+            MDLabel:
+                text: "Manage your farm"
+                halign: "center"
+                adaptive_height: True
+            MDGridLayout:
+                cols: 2
+                rows: 2
+                pos_hint: {"center_x": .5}
+                spacing: "20dp"
+                MDCard:
+                    size_hint_y: None
+                    height: self.width
+                    orientation: "vertical"
+                    padding: "15dp"
+                    spacing: "15dp"
+                    radius: "30dp"
+                    theme_bg_color: "Custom"
+                    md_bg_color: self.theme_cls.surfaceContainerLowColor
+                    on_release: root.switch_screen("yield prediction screen")
+                    CoverImage:
+                        size_hint_x: None
+                        width: self.height
+                        radius: "15dp"
+                        pos_hint: {"center_x": .5}
+                    MDLabel
+                        halign: "center"
+                        adaptive_height: True
+                        text: "Yield Prediction"
+                        role: "medium"
+                MDCard
+                    size_hint_y: None
+                    height: self.width
+                    orientation: "vertical"
+                    padding: "15dp"
+                    spacing: "15dp"
+                    radius: "30dp"
+                    theme_bg_color: "Custom"
+                    md_bg_color: self.theme_cls.surfaceContainerLowColor
+                    CoverImage:
+                        size_hint_x: None
+                        width: self.height
+                        radius: "15dp"
+                        pos_hint: {"center_x": .5}
+                    MDLabel
+                        halign: "center"
+                        adaptive_height: True
+                        text: "Crop Analysis"
+                        role: "medium"
+                MDCard:
+                    size_hint_y: None
+                    height: self.width
+                    orientation: "vertical"
+                    padding: "15dp"
+                    spacing: "15dp"
+                    radius: "30dp"
+                    theme_bg_color: "Custom"
+                    md_bg_color: self.theme_cls.surfaceContainerLowColor
+                    CoverImage:
+                        size_hint_x: None
+                        width: self.height
+                        radius: "15dp"
+                        pos_hint: {"center_x": .5}
+                    MDLabel
+                        halign: "center"
+                        adaptive_height: True
+                        text: "Inventory"
+                        role: "medium"
+                MDCard:
+                    size_hint_y: None
+                    height: self.width
+                    orientation: "vertical"
+                    padding: "15dp"
+                    spacing: "15dp"
+                    radius: "30dp"
+                    theme_bg_color: "Custom"
+                    md_bg_color: self.theme_cls.surfaceContainerLowColor
+                    CoverImage:
+                        size_hint_x: None
+                        width: self.height
+                        radius: "15dp"
+                        pos_hint: {"center_x": .5}
+                    MDLabel
+                        halign: "center"
+                        adaptive_height: True
+                        text: "Advisory"
+                        role: "medium"
+            TextField:
+                hint_text: "Chat with Farmi AI"
+                radius: self.height / 2
+                theme_bg_color: "Custom"
+                font_size: "20sp"
+                md_bg_color: self.theme_cls.surfaceContainerLowColor
+                icon_right: "star-four-points"
+                theme_right_icon_color: "Custom"
+                icon_right_color: self.theme_cls.primaryColor
