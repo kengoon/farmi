@@ -10,7 +10,10 @@ You can read more about this template at the links below:
 https://github.com/HeaTTheatR/LoginAppMVC
 https://en.wikipedia.org/wiki/Model–view–controller
 """
+from os import path
 
+from kivy.loader import Loader
+from kivymd import images_path
 from kivymd.app import MDApp
 from kivymd.uix.screenmanager import MDScreenManager
 from kivymd.uix.transition import MDSharedAxisTransition
@@ -27,6 +30,9 @@ from Model.database import DataBase
 from Components.factory import register_factory
 
 register_factory()
+Loader.error_image = path.join(images_path, "transparent.png")
+Loader.loading_image = path.join(images_path, "transparent.png")
+Window.softinput_mode = "below_target"
 
 
 class Farmi(MDApp):
@@ -38,6 +44,9 @@ class Farmi(MDApp):
         self.theme_cls.bind(
             theme_style=self.update_colors,
             surfaceColor=Window.setter("clearcolor")
+        )
+        self.theme_cls.bind(
+            surfaceColor=self.update_colors
         )
     
     def build(self):
