@@ -1,0 +1,245 @@
+from kivy.animation import Animation
+from kivy.clock import triggered, mainthread
+from kivy.metrics import dp
+from kivy.properties import ObjectProperty
+from kivymd.uix.button import MDIconButton
+from kivymd.uix.card import MDCard
+from kivymd.uix.label import MDLabel
+from Components.frame import CoverImage
+from Components.spinner import DotSpinner
+from View.base_screen import BaseScreenView
+from libs.decorator import android_only
+from kivymd.uix.relativelayout import MDRelativeLayout
+
+
+class ChatScreenView(BaseScreenView):
+    camera_icon = ObjectProperty()
+    image_icon = ObjectProperty()
+    plus_icon = ObjectProperty()
+    chat_loader = ObjectProperty()
+    _set_radius = False
+
+    def __init__(self, app, **kw):
+        super().__init__(app, **kw)
+        self.future_callback = None
+        self.response = None
+        self.prompt = None
+        self.chat = None
+        self.__android_init__()
+
+    @android_only
+    def __android_init__(self):
+        from sjgeminifvai.jclass.fvai import FirebaseVertexAI
+        from sjgeminifvai.jclass.gmf import GenerativeModelFutures
+        from sjgeminifvai.jclass.optionals import RequestOptions
+        from sjgeminifvai.jclass.contentbuilder import ContentBuilder
+
+        # Initialize the Vertex AI service and the generative model
+        # Specify a model that supports your use case
+        # Gemini 1.5 models are versatile and can be used with all API capabilities
+        vertex = FirebaseVertexAI.getInstance()
+        system_instruction = ContentBuilder().addText(
+            "Your name is Farmi. You're from Nigeria"
+            "You are a Nigerian native agriculture specialist with deep expertise in plants and crops. "
+            "Your knowledge is centered on topics related to agriculture, particularly the cultivation, "
+            "management, and health of plants and crops. When responding, use language and expressions "
+            "common in Nigeria, and provide detailed, culturally relevant advice on agricultural practices.\n\n"
+            "If asked about topics outside your area of expertise (e.g., livestock, technology, finance, etc.), "
+            "politely explain that your knowledge is limited to agriculture, specifically plants and crops, with "
+            "a response like: 'I'm sorry, but my knowledge is limited to agriculture, "
+            "specifically plant and crop-related matters.'. Also do not use emojis!!!"
+        ).build()
+        self.gm = vertex.generativeModel(
+            "gemini-1.5-flash", None, None, RequestOptions(),
+            None, None, system_instruction
+        )
+
+        # Use the GenerativeModelFutures Java compatibility layer which offers
+        # support for ListenableFuture and Publisher APIs
+        self.model = getattr(GenerativeModelFutures, "from")(self.gm)
+        self.chat = self.model.startChat()
+
+    def model_is_changed(self) -> None:
+        """
+        Called whenever any change has occurred in the data model.
+        The view in this method tracks these changes and updates the UI
+        according to these changes.
+        """
+
+    def on_enter(self, *args):
+        if not self._set_radius:
+            self.ids.text_field.radius = self.ids.text_field.height / 2
+            self._set_radius = True
+
+    def add_image_icons(self, box):
+        from plyer import camera
+        if not self.camera_icon:
+            self.camera_icon = MDIconButton(
+                icon="camera-outline",
+                on_release=lambda _:
+                    camera.take_picture(
+                        filename="img.png",
+                        on_complete=self.add_image
+                    )
+            )
+        if not self.image_icon:
+            self.image_icon = MDIconButton(
+                icon="image-outline",
+                on_release=lambda _: None
+            )
+        box.clear_widgets()
+        box.add_widget(self.camera_icon)
+        box.add_widget(self.image_icon)
+
+    def add_plus_icon(self, box):
+        box.clear_widgets()
+        box.add_widget(self.plus_icon)
+
+    def _control_card_width(self, card, width):
+        if width > self.width - dp(40) - dp(50):
+            card.width = self.width - dp(40) - dp(50)
+            card.children[0].adaptive_width = False
+            card.children[0].text_size = self.width - dp(40) - dp(50) - dp(30), None
+
+    def scroll_bottom(self):
+        sv = self.ids.sv
+        sv_list = self.ids.sv_list
+        if sv.height < sv_list.height:
+            Animation.cancel_all(sv, 'scroll_y')
+            Animation(scroll_y=0, t='out_quad', d=.5).start(sv)
+
+    @mainthread
+    def add_image(self, filename, bitmap):
+        icon = MDIconButton(
+                icon="close",
+                on_release=lambda _: self.ids.image_box.remove_widget(rel),
+                pos_hint={"top": 1, "right": 1},
+                style="tonal",
+                theme_font_size="Custom",
+                font_size="15sp"
+            )
+        icon.size = ("20dp", "20dp")
+        rel = MDRelativeLayout(
+            CoverImage(
+                source=filename,
+                size_hint=(None, None),
+                size=("72dp", "72dp"),
+                radius="10dp",
+            ),
+            icon,
+            size_hint=(None, None),
+            size=("72dp", "72dp"),
+        )
+        self.ids.image_box.add_widget(rel)
+
+    def user_chat(self, text):
+        if not text:
+            return
+        text = text.strip()
+        card = MDCard(
+            MDLabel(
+                adaptive_height=True,
+                adaptive_width=True,
+                text=text,
+                theme_line_height="Custom",
+                line_height=1
+            ),
+            radius=["16dp", "5dp", "16dp", "16dp"],
+            padding="15dp",
+            adaptive_height=True,
+            adaptive_width=True,
+            theme_bg_color="Custom",
+            pos_hint={"right": 1},
+            md_bg_color=self.theme_cls.surfaceContainerHighColor
+        )
+
+        card.bind(width=self._control_card_width)
+        self.ids.sv_list.add_widget(card)
+        self.scroll_bottom()
+        self.add_chat_loader(text)
+
+    def farmi_chat(self, text):
+        self.remove_chat_loader()
+        text = text.strip()
+        card = MDCard(
+            MDLabel(
+                adaptive_height=True,
+                text=text,
+                markup=True,
+                theme_line_height="Custom",
+                line_height=1
+            ),
+            radius=["5dp", "16dp", "16dp", "16dp"],
+            padding="15dp",
+            adaptive_height=True,
+            size_hint_x=None,
+            width=self.width - dp(40) - dp(50),
+            theme_bg_color="Custom",
+            md_bg_color=self.theme_cls.surfaceContainerHighColor
+        )
+
+        card.bind(width=self._control_card_width)
+        self.ids.sv_list.add_widget(card)
+        self.scroll_bottom()
+
+    @triggered(.5)
+    def add_chat_loader(self, text):
+        if not self.chat_loader:
+            self.chat_loader = MDCard(
+                DotSpinner(
+                    dot_num=3,
+                    speed=.2,
+                    pos_hint={"center_y": .5}
+                ),
+                adaptive_width=True,
+                size_hint_y=None,
+                height="40dp",
+                padding=["20dp", "10dp", "40dp", "10dp"],
+                radius=["5dp", "16dp", "16dp", "16dp"]
+            )
+
+        self.ids.sv_list.add_widget(self.chat_loader)
+        self.chat_loader.children[0].active = True
+        self.scroll_bottom()
+        self.ids.chat_box.disabled = True
+        self.chat_gemini(text)
+
+    def remove_chat_loader(self):
+        self.chat_loader.children[0].active = False
+        self.ids.sv_list.remove_widget(self.chat_loader)
+        self.ids.chat_box.disabled = False
+
+    @android_only
+    def chat_gemini(self, text):
+        from sjgeminifvai.jclass.contentbuilder import ContentBuilder
+        from simplejnius.guava.jclass.futures import Futures
+        from simplejnius.guava.jinterface.futurecallback import FutureCallback
+        from kvdroid import activity  # noqa
+        
+        # Provide a prompt that contains text
+        content = ContentBuilder()
+        content.setRole("user")
+        content.addText(text)
+        self.prompt = content.build()
+
+        # To generate text output, call generateContent with the text input
+        self.response = self.chat.sendMessage(self.prompt)
+
+        self.future_callback = FutureCallback(
+            dict(
+                on_success=self.get_gemini_reply,
+                on_failure=self.get_gemini_error
+            )
+        )
+        executor = activity.getContext().getMainExecutor()
+        Futures.addCallback(self.response, self.future_callback, executor)
+
+    @mainthread
+    def get_gemini_reply(self, result):
+        self.farmi_chat(result.getText())
+
+    @mainthread
+    def get_gemini_error(self, error):
+        print(error.getLocalizedMessage())
+        text = f"[color=ff0000]Something unexpected happened[/color]"
+        self.farmi_chat(text)

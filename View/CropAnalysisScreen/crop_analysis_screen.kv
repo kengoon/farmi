@@ -1,0 +1,99 @@
+<CropAnalysisScreenView>
+    name: 'crop analysis screen'
+    MDBoxLayout:
+        orientation: "vertical"
+        MDTopAppBar:
+            type: "small"
+            MDTopAppBarLeadingButtonContainer:
+                MDActionTopAppBarButton:
+                    icon: "arrow-left"
+                    on_release: root.switch_screen("home screen")
+            MDTopAppBarTitle:
+                text: "Crop Analysis"
+        MDBoxLayout:
+            padding: "20dp"
+            spacing: "20dp"
+            orientation: "vertical"
+            MDBoxLayout:
+                md_bg_color: self.theme_cls.surfaceContainerHighestColor
+                radius: "16dp"
+                MDRelativeLayout:
+                    MDIcon:
+                        theme_font_size: "Custom"
+                        font_size: "50sp"
+                        icon: "camera-image"
+                        pos_hint: {"center": [.5, .5]}
+                        theme_icon_color: "Custom"
+                        icon_color: self.theme_cls.disabledTextColor
+                    CoverImage:
+                        id: cover_image
+                        radius: self.parent.parent.radius
+                        color: [0, 0, 0, 0] if not self.source else "white"
+            MDLabel:
+                text: "Upload crop image via:"
+                adaptive_height: True
+                bold: True
+            MDGridLayout:
+                cols: 2
+                rows: 1
+                adaptive_height: True
+                spacing: "20dp"
+                MDCard:
+                    size_hint_y: None
+                    height: self.width
+                    orientation: "vertical"
+                    padding: "15dp"
+                    spacing: "15dp"
+                    radius: "30dp"
+                    on_release: root.switch_screen("yield prediction screen")
+                    MDRelativeLayout:
+                        MDIcon:
+                            theme_font_size: "Custom"
+                            font_size: "50sp"
+                            icon: "camera"
+                            pos_hint: {"center": [.5, .5]}
+                    MDLabel
+                        halign: "center"
+                        adaptive_height: True
+                        text: "Camera"
+                        role: "medium"
+                MDCard:
+                    size_hint_y: None
+                    height: self.width
+                    orientation: "vertical"
+                    padding: "15dp"
+                    spacing: "15dp"
+                    radius: "30dp"
+                    on_release: root.switch_screen("yield prediction screen")
+                    MDRelativeLayout:
+                        MDIcon:
+                            theme_font_size: "Custom"
+                            font_size: "50sp"
+                            icon: "folder-image"
+                            pos_hint: {"center": [.5, .5]}
+                    MDLabel
+                        halign: "center"
+                        adaptive_height: True
+                        text: "Photo picker"
+                        role: "medium"
+            MDBoxLayout:
+                adaptive_height: True
+                spacing: "10dp"
+                TextField:
+                    id: text_field
+                    theme_bg_color: "Custom"
+                    hint_text: "Soil pH"
+                    pos_hint: {"center_y": .5}
+                    multiline: True
+                    radius: self.height / 2
+                    on_focus: if args[1]: root.add_plus_icon(box)
+                MDRelativeLayout:
+                    size_hint: None, None
+                    size: dp(40), ((dp(10) * 3) + sp(16))
+                    MDIconButton:
+                        style: "filled"
+                        icon: "arrow-up"
+                        pos_hint: {"center": [.5, .5]}
+                        on_release:
+                            text_field.text = ""
+
