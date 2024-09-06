@@ -48,10 +48,10 @@ requirements = python3,kivy,https://github.com/kivymd/KivyMD/archive/master.zip,
 # requirements.source.kivy = ../../kivy
 
 # (str) Presplash of the application
-#presplash.filename = %(source.dir)s/data/presplash.png
+presplash.filename = %(source.dir)s/assets/images/presplash.png
 
 # (str) Icon of the application
-#icon.filename = %(source.dir)s/data/icon.png
+icon.filename = %(source.dir)s/assets/images/icon.png
 
 # (list) Supported orientations
 # Valid options are: landscape, portrait, portrait-reverse or landscape-reverse
@@ -85,7 +85,7 @@ fullscreen = 0
 # red, blue, green, black, white, gray, cyan, magenta, yellow, lightgray,
 # darkgray, grey, lightgrey, darkgrey, aqua, fuchsia, lime, maroon, navy,
 # olive, purple, silver, teal.
-#android.presplash_color = #FFFFFF
+android.presplash_color = #F8FBF1
 
 # (string) Presplash animation using Lottie format.
 # see https://lottiefiles.com/ for examples and https://airbnb.design/lottie/
@@ -163,7 +163,7 @@ android.accept_sdk_license = True
 #android.service_class_name = org.kivy.android.PythonService
 
 # (str) Android app theme, default is ok for Kivy-based app
-# android.apptheme = "@android:style/Theme.NoTitleBar"
+android.apptheme = @style/Theme.App
 
 # (list) Pattern to whitelist for the whole project
 #android.whitelist =
@@ -203,7 +203,7 @@ android.accept_sdk_license = True
 # 3) A directory, here 'legal_resources' must contain one or more directories, 
 # each of a resource kind:  drawable, xml, etc...
 # android.add_resources = legal_resources
-#android.add_resources =
+android.add_resources = res
 
 # (list) Gradle dependencies to add
 android.gradle_dependencies = io.github.simplejnius:sjfirebase:1.3.0,
