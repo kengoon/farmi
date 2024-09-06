@@ -1,5 +1,12 @@
 import contextlib
 
+from kivy.animation import Animation
+from kivy.clock import Clock
+from kivy.metrics import dp
+from kivymd.uix.button import MDIconButton
+from kivymd.uix.card import MDCard
+from kivymd.uix.label import MDLabel
+
 from View.base_screen import BaseScreenView
 
 
@@ -64,6 +71,10 @@ class YieldPredictionScreenView(BaseScreenView):
     item_index = 0
     prev_item_index = 0
 
+    def __init__(self, app, **kw):
+        super().__init__(app, **kw)
+        self.set_radius = False
+
     def model_is_changed(self) -> None:
         """
         Called whenever any change has occurred in the data model.
@@ -72,7 +83,83 @@ class YieldPredictionScreenView(BaseScreenView):
         """
 
     def on_enter(self):
-        self.set_input(False)
+        if self.item_index > 0:
+            return
+        if not self.set_radius:
+            self.ids.text_field.radius = self.ids.text_field.height / 2
+            self.set_radius = True
+        self.farmi_chat()
+
+    def farmi_chat(self):
+        if self.item_index > len(self.input_prediction) - 1:
+            return
+        question = self.input_prediction[self.item_index][0] + "?"
+        description = self.input_prediction[self.item_index][1]
+        self.ids.sv_list.add_widget(
+            MDCard(
+                MDLabel(
+                    adaptive_height=True,
+                    text=f"[b]{question}[/b]\n\n{description}",
+                    markup=True,
+                    theme_line_height="Custom",
+                    line_height=1
+                ),
+                radius=["5dp", "16dp", "16dp", "16dp"],
+                padding="15dp",
+                adaptive_height=True,
+                size_hint_x=None,
+                width=self.width - dp(40) - dp(50),
+                theme_bg_color="Custom",
+                md_bg_color=self.theme_cls.surfaceContainerHighColor
+            )
+        )
+        self.item_index += 1
+        self.scroll_bottom()
+
+    def user_chat(self, text):
+        if not text:
+            return
+        question = self.input_prediction[self.item_index][0]
+        self.put_extra(question, self.ids.text_field.text)
+        card = MDCard(
+            MDLabel(
+                adaptive_height=True,
+                adaptive_width=True,
+                text=text,
+                theme_line_height="Custom",
+                line_height=1
+            ),
+            radius=["16dp", "5dp", "16dp", "16dp"],
+            padding="15dp",
+            adaptive_height=True,
+            adaptive_width=True,
+            theme_bg_color="Custom",
+            pos_hint={"right": 1},
+            md_bg_color=self.theme_cls.surfaceContainerHighColor
+        )
+
+        def control_card_width(_, width):
+            if width > self.width - dp(40) - dp(50):
+                card.width = self.width - dp(40) - dp(50)
+                card.children[0].adaptive_width = False
+                card.children[0].text_size = self.width - dp(40) - dp(50) - dp(30), None
+
+        card.bind(width=control_card_width)
+        self.ids.sv_list.add_widget(card)
+        self.scroll_bottom()
+
+        if self.item_index == len(self.input_prediction) - 1:
+            self.start_prediction()
+            return 
+
+        Clock.schedule_once(lambda _: self.farmi_chat(), 1)
+
+    def scroll_bottom(self):
+        sv = self.ids.sv
+        sv_list = self.ids.sv_list
+        if sv.height < sv_list.height:
+            Animation.cancel_all(sv, 'scroll_y')
+            Animation(scroll_y=0, t='out_quad', d=.5).start(sv)
 
     def set_input(self, check=True):
         if self.item_index < 0:
@@ -82,6 +169,7 @@ class YieldPredictionScreenView(BaseScreenView):
             self.item_index = len(self.input_prediction) - 1
             return
         if not self.ids.text_field.text and self.prev_item_index == self.item_index and check:
+            self.ids.text_field.focus = True
             return self.toast(f"Fill {self.input_prediction[self.item_index][0]}")
         if check:
             self.put_extra(self.ids.text_field.hint_text, self.ids.text_field.text)
@@ -108,5 +196,3 @@ class YieldPredictionScreenView(BaseScreenView):
             text = self.get_extra(item[0], "")
             self.ids.text_field.text = text
             self.prev_item_index = self.item_index
-
-

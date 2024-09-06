@@ -1,47 +1,58 @@
 <YieldPredictionScreenView>
     name: 'yield prediction screen'
     MDBoxLayout:
-        spacing: "20dp"
-        padding: "20dp"
         orientation: "vertical"
-        MDIconButton:
-            icon: "arrow-left"
-            on_release: root.switch_screen("home screen")
-        MDLabel:
-            text: "Yield Prediction"
-            font_style: "Headline"
-            adaptive_height: True
-        MDBoxLayout:
+        MDTopAppBar:
+            type: "small"
+            MDTopAppBarLeadingButtonContainer:
+                MDActionTopAppBarButton:
+                    icon: "arrow-left"
+                    on_release: root.switch_screen("home screen")
+            MDTopAppBarTitle:
+                text: "Yield Prediction"
+                theme_font_size: "Custom"
+                font_size: "18sp"
+                bold: True
+        MDScrollView:
+            id: sv
+            bar_width: 0
             MDBoxLayout:
-                adaptive_height: True
-                spacing: "10dp"
+                id: sv_list
+                spacing: "20dp"
+                padding: "20dp"
                 orientation: "vertical"
-                pos_hint: {"center_y": .6}
-                TextField:
-                    id: text_field
-                    radius: self.height / 2
-                    theme_bg_color: "Custom"
-                    font_size: "20sp"
-                MDLabel:
-                    id: description
-                    adaptive_height: True
-                    role: "medium"
-                    halign: "center"
+                adaptive_height: True
         MDBoxLayout:
             adaptive_height: True
-            MDButton:
-                id: prev_btn
-                on_release:
-                    root.item_index -= 1
-                    root.set_input()
-                MDButtonText:
-                    text: "Previous"
-            MDWidget:
-            MDButton:
-                id: next_btn
-                on_release:
-                    root.item_index += 1
-                    root.set_input()
-                MDButtonText:
-                    id: next_btn_text
-                    text: "Next"
+            spacing: "10dp"
+            padding: "10dp"
+#            MDRelativeLayout:
+#                size_hint: None, None
+#                size: box.width, ((dp(10) * 3) + sp(16))
+#                MDBoxLayout:
+#                    id: box
+#                    adaptive_size: True
+#                    pos_hint: {"center": [.5, .5]}
+#                    MDIconButton:
+#                        id: plus_icon
+#                        icon: "plus"
+#                        theme_bg_color: "Custom"
+#                        md_bg_color: self.theme_cls.surfaceContainerHighColor
+#                        on_release: root.add_image_icons(box)
+            TextField:
+                id: text_field
+                theme_bg_color: "Custom"
+                hint_text: "Message"
+                pos_hint: {"center_y": .5}
+                multiline: True
+                on_focus: if args[1]: root.add_plus_icon(box)
+            MDRelativeLayout:
+                size_hint: None, None
+                size: dp(40), ((dp(10) * 3) + sp(16))
+                MDIconButton:
+                    style: "filled"
+                    icon: "arrow-up"
+                    pos_hint: {"center": [.5, .5]}
+                    on_release:
+                        root.user_chat(text_field.text)
+                        text_field.text = ""
