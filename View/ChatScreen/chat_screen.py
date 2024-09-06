@@ -8,8 +8,11 @@ from kivymd.uix.label import MDLabel
 from Components.frame import CoverImage
 from Components.spinner import DotSpinner
 from View.base_screen import BaseScreenView
+from kivymd.uix.gridlayout import MDGridLayout
 from libs.decorator import android_only
 from kivymd.uix.relativelayout import MDRelativeLayout
+from time import time
+from kivymd.uix.behaviors import StencilBehavior
 
 
 class ChatScreenView(BaseScreenView):
@@ -25,6 +28,7 @@ class ChatScreenView(BaseScreenView):
         self.response = None
         self.prompt = None
         self.chat = None
+        self.bitmaps = []
         self.__android_init__()
 
     @android_only
@@ -72,15 +76,10 @@ class ChatScreenView(BaseScreenView):
             self._set_radius = True
 
     def add_image_icons(self, box):
-        from plyer import camera
         if not self.camera_icon:
             self.camera_icon = MDIconButton(
                 icon="camera-outline",
-                on_release=lambda _:
-                    camera.take_picture(
-                        filename="img.png",
-                        on_complete=self.add_image
-                    )
+                on_release=lambda _: self.take_picture()
             )
         if not self.image_icon:
             self.image_icon = MDIconButton(
@@ -90,6 +89,16 @@ class ChatScreenView(BaseScreenView):
         box.clear_widgets()
         box.add_widget(self.camera_icon)
         box.add_widget(self.image_icon)
+
+    def take_picture(self):
+        if self.bitmaps == 4:
+            return self.toast("Max of 4 pictures only")
+
+        from plyer import camera
+        camera.take_picture(
+            filename=f"images/img{str(time()).replace('.', '')}.png",
+            on_complete=self.add_image
+        )
 
     def add_plus_icon(self, box):
         box.clear_widgets()
@@ -111,13 +120,13 @@ class ChatScreenView(BaseScreenView):
     @mainthread
     def add_image(self, filename, bitmap):
         icon = MDIconButton(
-                icon="close",
-                on_release=lambda _: self.ids.image_box.remove_widget(rel),
-                pos_hint={"top": 1, "right": 1},
-                style="tonal",
-                theme_font_size="Custom",
-                font_size="15sp"
-            )
+            icon="close",
+            on_release=lambda _: self.ids.image_box.remove_widget(rel),
+            pos_hint={"top": 1, "right": 1},
+            style="tonal",
+            theme_font_size="Custom",
+            font_size="15sp"
+        )
         icon.size = ("20dp", "20dp")
         rel = MDRelativeLayout(
             CoverImage(
@@ -131,6 +140,7 @@ class ChatScreenView(BaseScreenView):
             size=("72dp", "72dp"),
         )
         self.ids.image_box.add_widget(rel)
+        self.bitmaps.append(bitmap)
 
     def user_chat(self, text):
         if not text:
@@ -144,14 +154,33 @@ class ChatScreenView(BaseScreenView):
                 theme_line_height="Custom",
                 line_height=1
             ),
+            spacing="15dp",
             radius=["16dp", "5dp", "16dp", "16dp"],
             padding="15dp",
             adaptive_height=True,
             adaptive_width=True,
             theme_bg_color="Custom",
             pos_hint={"right": 1},
-            md_bg_color=self.theme_cls.surfaceContainerHighColor
+            md_bg_color=self.theme_cls.surfaceContainerHighColor,
+            orientation="vertical"
         )
+
+        if self.ids.image_box.children:
+
+            class CustomGridLayout(StencilBehavior, MDGridLayout):
+                pass
+
+            grid = CustomGridLayout(
+                size_hint=(None, None),
+                size=(self.width - dp(40) - dp(50) - dp(30), "150dp"),
+                cols=2,
+                spacing="3dp",
+                radius="10dp"
+            )
+            for rel in self.ids.image_box.children:
+                img = rel.children[-1]
+                grid.add_widget(CoverImage(source=img.source))
+            card.add_widget(grid)
 
         card.bind(width=self._control_card_width)
         self.ids.sv_list.add_widget(card)
@@ -215,10 +244,14 @@ class ChatScreenView(BaseScreenView):
         from simplejnius.guava.jclass.futures import Futures
         from simplejnius.guava.jinterface.futurecallback import FutureCallback
         from kvdroid import activity  # noqa
-        
+
         # Provide a prompt that contains text
         content = ContentBuilder()
         content.setRole("user")
+        for bitmap in self.bitmaps:
+            content.addImage(bitmap)
+        self.bitmaps = []
+        self.ids.image_box.clear_widgets()
         content.addText(text)
         self.prompt = content.build()
 
