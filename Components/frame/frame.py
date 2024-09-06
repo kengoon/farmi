@@ -16,8 +16,8 @@ class CoverImage(AsyncImage, StencilBehavior):
     fit_mode = StringProperty("cover")
 
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
         self.clock = Clock.create_trigger(self.try_load_image, 1, True)
+        super().__init__(**kwargs)
 
     def try_load_image(self, _):
         self.reload()
