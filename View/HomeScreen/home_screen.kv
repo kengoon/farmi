@@ -111,11 +111,12 @@
                             pos_hint: {"center_x": .5}
                             MDChipText:
                                 text: "Good"
-        MDCard:
+        MDBoxLayout:
             radius: "40dp", "40dp", 0, 0
             orientation: "vertical"
             padding: "20dp"
             spacing: "20dp"
+            md_bg_color: self.theme_cls.surfaceContainerHighestColor
             MDLabel:
                 text: "Manage your farm"
                 halign: "center"
@@ -133,13 +134,14 @@
                     spacing: "15dp"
                     radius: "30dp"
                     theme_bg_color: "Custom"
-                    md_bg_color: self.theme_cls.surfaceContainerLowColor
+                    md_bg_color: self.theme_cls.surfaceColor
                     on_release: root.switch_screen("yield prediction screen")
                     CoverImage:
                         size_hint_x: None
                         width: self.height
-                        radius: "15dp"
+                        radius: self.height / 2
                         pos_hint: {"center_x": .5}
+                        source: "assets/images/crop.png"
                     MDLabel
                         halign: "center"
                         adaptive_height: True
@@ -153,12 +155,14 @@
                     spacing: "15dp"
                     radius: "30dp"
                     theme_bg_color: "Custom"
-                    md_bg_color: self.theme_cls.surfaceContainerLowColor
+                    md_bg_color: self.theme_cls.surfaceColor
+                    on_release: root.switch_screen("crop analysis screen")
                     CoverImage:
                         size_hint_x: None
                         width: self.height
-                        radius: "15dp"
+                        radius: self.height / 2
                         pos_hint: {"center_x": .5}
+                        source: "assets/images/growth.png"
                     MDLabel
                         halign: "center"
                         adaptive_height: True
@@ -172,12 +176,13 @@
                     spacing: "15dp"
                     radius: "30dp"
                     theme_bg_color: "Custom"
-                    md_bg_color: self.theme_cls.surfaceContainerLowColor
+                    md_bg_color: self.theme_cls.surfaceColor
                     CoverImage:
                         size_hint_x: None
                         width: self.height
-                        radius: "15dp"
+                        radius: self.height / 2
                         pos_hint: {"center_x": .5}
+                        source: "assets/images/crate.png"
                     MDLabel
                         halign: "center"
                         adaptive_height: True
@@ -191,12 +196,13 @@
                     spacing: "15dp"
                     radius: "30dp"
                     theme_bg_color: "Custom"
-                    md_bg_color: self.theme_cls.surfaceContainerLowColor
+                    md_bg_color: self.theme_cls.surfaceColor
                     CoverImage:
                         size_hint_x: None
                         width: self.height
-                        radius: "15dp"
+                        radius: self.height / 2
                         pos_hint: {"center_x": .5}
+                        source: "assets/images/smart-farm.png"
                     MDLabel
                         halign: "center"
                         adaptive_height: True
@@ -207,7 +213,9 @@
                 radius: self.height / 2
                 theme_bg_color: "Custom"
                 font_size: "20sp"
-                md_bg_color: self.theme_cls.surfaceContainerLowColor
-                icon_right: "star-four-points"
+                md_bg_color: self.theme_cls.surfaceColor
+                icon_right: "tree"
                 theme_right_icon_color: "Custom"
+                field_disabled: True
                 icon_right_color: self.theme_cls.primaryColor
+                on_release: root.switch_screen("chat screen")
