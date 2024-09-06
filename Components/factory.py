@@ -8,3 +8,5 @@ def register_factory():
     register("RealRecycleView", module="Components.scrollview")
     register("TextField", module="Components.textfield")
     register("TagTextField", module="Components.textfield")
+    register("Dot", module="Components.dot")
+    register("DotSpinner", module="Components.spinner")
