@@ -10,6 +10,7 @@ You can read more about this template at the links below:
 https://github.com/HeaTTheatR/LoginAppMVC
 https://en.wikipedia.org/wiki/Model–view–controller
 """
+import os
 from os import path
 
 from kivy.loader import Loader
@@ -39,7 +40,7 @@ class Farmi(MDApp):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.database = DataBase()
-
+        self.screens = []
         self.dialog = None
         self.theme_cls.bind(
             theme_style=self.update_colors,
@@ -48,14 +49,15 @@ class Farmi(MDApp):
         self.theme_cls.bind(
             surfaceColor=self.update_colors
         )
-    
+        Window.bind(on_keyboard=self.on_back_button)
+
     def build(self):
         # Uncomment me if you need me
         Builder.load_file("imports.kv")
         # self.theme_cls.theme_style = "Dark"
         self.theme_cls.primary_palette = "Green"
         # self.theme_cls.dynamic_scheme_contrast = -1
-        
+
         spinner = MDCircularProgressIndicator(line_width=dp(1.5))
         self.dialog = ModalView(
             auto_dismiss=False,
@@ -67,12 +69,12 @@ class Farmi(MDApp):
             on_dismiss=lambda _: setattr(spinner, "active", False)
         )
         self.dialog.add_widget(spinner)
-        
+
         # This is the screen manager that will contain all the screens of your
         # application.
         self.root = MDScreenManager(transition=MDSharedAxisTransition())
         self.add_screen("home screen", first=True)
-    
+
     @staticmethod
     def update_colors(instance, value):
         set_bars_colors(
@@ -80,7 +82,7 @@ class Farmi(MDApp):
             instance.surfaceColor,
             "Dark" if value == "Light" else "Light"
         )
-        
+
     def add_screen(self, name_screen, switch=True, first=False):
         if first:
             self.load_screen(name_screen, switch, first)
@@ -89,6 +91,8 @@ class Farmi(MDApp):
             self.dialog.open()
             Clock.schedule_once(lambda _: self.load_screen(name_screen, switch, first), 1)
         elif switch:
+            if self.root.current:
+                self.screens.append(self.root.current)
             self.root.current = name_screen
 
     def load_screen(self, name_screen, switch, first):
@@ -99,9 +103,22 @@ class Farmi(MDApp):
         controller.set_view(view)
         self.root.add_widget(view)
         if switch:
+            if self.root.current and not first:
+                self.screens.append(self.root.current)
             self.root.current = name_screen
         if not first:
             self.dialog.dismiss()
+
+    def on_back_button(self, _, key, *__):
+        if key in [27, 1001]:
+            try:
+                self.root.current = self.screens.pop()
+                return True
+            except IndexError:
+                return False
+
+    def on_stop(self):
+        os.rmdir("images")
 
 
 if __name__ == "__main__":
