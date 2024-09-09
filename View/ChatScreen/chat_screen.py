@@ -13,6 +13,9 @@ from libs.decorator import android_only
 from kivymd.uix.relativelayout import MDRelativeLayout
 from time import time
 from kivymd.uix.behaviors import StencilBehavior
+from libs.tools import get_bitmap
+from os.path import splitext
+from pickle import loads
 
 
 class ChatScreenView(BaseScreenView):
@@ -42,17 +45,10 @@ class ChatScreenView(BaseScreenView):
         # Specify a model that supports your use case
         # Gemini 1.5 models are versatile and can be used with all API capabilities
         vertex = FirebaseVertexAI.getInstance()
-        system_instruction = ContentBuilder().addText(
-            "Your name is Farmi. You're from Nigeria"
-            "You are a Nigerian native agriculture specialist with deep expertise in plants and crops. "
-            "Your knowledge is centered on topics related to agriculture, particularly the cultivation, "
-            "management, and health of plants and crops. When responding, use language and expressions "
-            "common in Nigeria, and provide detailed, culturally relevant advice on agricultural practices.\n\n"
-            "If asked about topics outside your area of expertise (e.g., livestock, technology, finance, etc.), "
-            "politely explain that your knowledge is limited to agriculture, specifically plants and crops, with "
-            "a response like: 'I'm sorry, but my knowledge is limited to agriculture, "
-            "specifically plant and crop-related matters.'. Also do not use emojis!!!"
-        ).build()
+        with open("system_instructions/chat_instruction.prompt", "rb") as model:
+            system_instruction = ContentBuilder().addText(
+                loads(model.read())
+            ).build()
         self.gm = vertex.generativeModel(
             "gemini-1.5-flash", None, None, RequestOptions(),
             None, None, system_instruction
@@ -84,14 +80,21 @@ class ChatScreenView(BaseScreenView):
         if not self.image_icon:
             self.image_icon = MDIconButton(
                 icon="image-outline",
-                on_release=lambda _: None
+                on_release=lambda _: self.open_photo_picker()
             )
         box.clear_widgets()
         box.add_widget(self.camera_icon)
         box.add_widget(self.image_icon)
 
+    def open_photo_picker(self):
+        if len(self.bitmaps) >= 4:
+            return self.toast("Max of 4 pictures only")
+
+        from kvdroid.tools.photo_picker import action_pick_image
+        action_pick_image(lambda path: self.add_image(path, get_bitmap(path)))
+
     def take_picture(self):
-        if self.bitmaps == 4:
+        if len(self.bitmaps) >= 4:
             return self.toast("Max of 4 pictures only")
 
         from plyer import camera
@@ -119,9 +122,17 @@ class ChatScreenView(BaseScreenView):
 
     @mainthread
     def add_image(self, filename, bitmap):
+        img_ext = ["png", "jpg", "jpeg", "PNG", "JPG", "JPEG", "gif", "GIF"]
+        ext = splitext(filename)[1].split(".")[1]
+        if ext not in img_ext:
+            return self.toast("Only images allowed")
+
+        def remove_bitmap():
+            self.bitmaps.remove(bitmap)
+            self.ids.image_box.remove_widget(rel)
         icon = MDIconButton(
             icon="close",
-            on_release=lambda _: self.ids.image_box.remove_widget(rel),
+            on_release=lambda _: remove_bitmap(),
             pos_hint={"top": 1, "right": 1},
             style="tonal",
             theme_font_size="Custom",
@@ -134,6 +145,7 @@ class ChatScreenView(BaseScreenView):
                 size_hint=(None, None),
                 size=("72dp", "72dp"),
                 radius="10dp",
+                on_error=lambda _: remove_bitmap()
             ),
             icon,
             size_hint=(None, None),
@@ -149,7 +161,7 @@ class ChatScreenView(BaseScreenView):
         card = MDCard(
             MDLabel(
                 adaptive_height=True,
-                adaptive_width=True,
+                adaptive_width=not self.ids.image_box.children,
                 text=text,
                 theme_line_height="Custom",
                 line_height=1
@@ -211,7 +223,7 @@ class ChatScreenView(BaseScreenView):
         self.ids.sv_list.add_widget(card)
         self.scroll_bottom()
 
-    @triggered(.5)
+    @triggered(.2)
     def add_chat_loader(self, text):
         if not self.chat_loader:
             self.chat_loader = MDCard(
