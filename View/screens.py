@@ -19,6 +19,9 @@ from View.InventoryScreen.inventory_screen import InventoryScreenView
 from Model.chat_screen import ChatScreenModel
 from Controller.chat_screen import ChatScreenController
 from View.ChatScreen.chat_screen import ChatScreenView
+from Model.chart_screen import ChartScreenModel
+from Controller.chart_screen import ChartScreenController
+from View.ChartScreen.chart_screen import ChartScreenView
 
 screens = {
     'crop analysis screen': {
@@ -40,6 +43,13 @@ screens = {
         'controller': YieldPredictionScreenController,
         'view': YieldPredictionScreenView,
         'kv': "./View/YieldPredictionScreen/yield_prediction_screen.kv"
+    },
+
+    'chart screen': {
+        'model': ChartScreenModel,
+        'controller': ChartScreenController,
+        'view': ChartScreenView,
+        'kv': "./View/ChartScreen/chart_screen.kv"
     },
 
     'onboard screen': {
