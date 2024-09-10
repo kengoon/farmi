@@ -1,0 +1,25 @@
+<ChartScreenView>
+    name: 'chart screen'
+    MDBoxLayout:
+        orientation: "vertical"
+        MDTopAppBar:
+            type: "small"
+            MDTopAppBarLeadingButtonContainer:
+                MDActionTopAppBarButton:
+                    icon: "arrow-left"
+                    on_release: root.switch_screen("crop analysis screen")
+            MDTopAppBarTitle:
+                text: f"Result Chart [color=406836ff][font={icon_path}][size={int(sp(20))}]\U000F15B6[/size][/font][/color]"
+                theme_font_size: "Custom"
+                font_size: "18sp"
+                bold: True
+                markup: True
+        MDScrollView:
+            id: sv
+            bar_width: 0
+            MDBoxLayout:
+                id: sv_list
+                spacing: "20dp"
+                padding: "20dp"
+                orientation: "vertical"
+                adaptive_height: True
