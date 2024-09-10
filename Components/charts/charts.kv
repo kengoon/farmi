@@ -1,0 +1,49 @@
+<PieChartNumberLabel>
+    size_hint: None, None
+    size: dp(40), dp(30)
+    text: root.title + "\n" + root.percent
+    font_size: dp(10)
+    halign: "center"
+    valign: "center"
+    font_style: "Caption"
+    theme_text_color: "Custom"
+    text_color: 1, 1, 1, 1
+
+
+<ChartLabel>
+    theme_text_color: "Custom"
+    text_color: root._owner.labels_color if root._owner else [1, 1, 1, 1]
+    halign: "center"
+    valign: "center"
+    adaptive_width: True
+    size_hint_y: None
+    theme_font_size: "Custom"
+    theme_line_height: "Custom"
+    line_height: 1
+
+
+<ChartBase>
+    padding: dp(30)
+    _labels_y_box: _labels_y_box
+    _labels_x_box: _labels_x_box
+    _canvas: _canvas
+    target_canvas: _canvas.canvas.after
+
+    # Layout to draw main shapes
+    BoxLayout:
+        id: _canvas
+        canvas.before:
+            Color:
+                rgba: root.bg_color or root.theme_cls.primaryColor
+            RoundedRectangle:
+                pos: self.pos
+                size: root.size
+                radius: root.radius or [dp(5), ]
+
+    # Y axis labels
+    RelativeLayout:
+        id: _labels_y_box
+
+    # X axis labels
+    RelativeLayout:
+        id: _labels_x_box
