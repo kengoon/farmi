@@ -7,6 +7,7 @@ from libs.decorator import android_only
 from libs.tools import get_bitmap
 from kivymd.uix.snackbar import MDSnackbar, MDSnackbarSupportingText
 from kivy.metrics import dp
+from kivy.clock import triggered
 
 
 class CropAnalysisScreenView(BaseScreenView):
@@ -71,6 +72,7 @@ class CropAnalysisScreenView(BaseScreenView):
         self.ids.cover_image.source = filename
         self.bitmap = bitmap
 
+    @triggered(.5)
     def start_analysis(self, soil_ph):
         if not self.bitmap:
             return self.toast("Please add an image")
@@ -107,7 +109,9 @@ class CropAnalysisScreenView(BaseScreenView):
         text = result.getText()
         try:
             data = json.loads(text)
+            data["image"] = self.ids.cover_image.source
             self.put_extra("analysis", data)
+            self.put_extra("analytical_type", "crop_analysis")
             self.switch_screen("chart screen")
         except json.JSONDecodeError:
             self.get_gemini_error(text.strip())

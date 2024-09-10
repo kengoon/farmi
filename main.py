@@ -31,8 +31,8 @@ from Model.database import DataBase
 from Components.factory import register_factory
 
 register_factory()
-Loader.error_image = path.join(images_path, "transparent.png")
-Loader.loading_image = path.join(images_path, "transparent.png")
+# Loader.error_image = path.join(images_path, "transparent.png")
+# Loader.loading_image = path.join(images_path, "transparent.png")
 Window.softinput_mode = "below_target"
 
 
@@ -94,6 +94,7 @@ class Farmi(MDApp):
             if self.root.current:
                 self.screens.append(self.root.current)
             self.root.current = name_screen
+            self.dialog.dismiss()
 
     def load_screen(self, name_screen, switch, first):
         Builder.load_file(screens[name_screen]["kv"])
@@ -106,8 +107,7 @@ class Farmi(MDApp):
             if self.root.current and not first:
                 self.screens.append(self.root.current)
             self.root.current = name_screen
-        if not first:
-            self.dialog.dismiss()
+        self.dialog.dismiss()
 
     def on_back_button(self, _, key, *__):
         if key in [27, 1001]:

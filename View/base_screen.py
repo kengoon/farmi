@@ -57,3 +57,11 @@ class BaseScreenView(MDScreen, Observer):
         toast(text)
         self.dismiss_dialog()
 
+    @mainthread
+    def dismiss_dialog(self):
+        self.app.dialog.dismiss()
+
+    @mainthread
+    def open_dialog(self):
+        self.app.dialog.open()
+
