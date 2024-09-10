@@ -45,7 +45,7 @@
                     padding: "15dp"
                     spacing: "15dp"
                     radius: "30dp"
-                    on_release: root.switch_screen("yield prediction screen")
+                    on_release: root.take_picture()
                     MDRelativeLayout:
                         MDIcon:
                             theme_font_size: "Custom"
@@ -64,7 +64,7 @@
                     padding: "15dp"
                     spacing: "15dp"
                     radius: "30dp"
-                    on_release: root.switch_screen("yield prediction screen")
+                    on_release: root.open_photo_picker()
                     MDRelativeLayout:
                         MDIcon:
                             theme_font_size: "Custom"
@@ -79,21 +79,24 @@
             MDBoxLayout:
                 adaptive_height: True
                 spacing: "10dp"
+                orientation: "vertical"
                 TextField:
                     id: text_field
                     theme_bg_color: "Custom"
-                    hint_text: "Soil pH"
+                    hint_text: "Soil pH (Optional)"
                     pos_hint: {"center_y": .5}
-                    multiline: True
+                    input_filter: "int"
+                    input_type: "number"
                     radius: self.height / 2
-                    on_focus: if args[1]: root.add_plus_icon(box)
-                MDRelativeLayout:
-                    size_hint: None, None
-                    size: dp(40), ((dp(10) * 3) + sp(16))
-                    MDIconButton:
-                        style: "filled"
-                        icon: "arrow-up"
+                MDButton:
+                    theme_width: "Custom"
+                    size_hint_x: 1
+                    theme_bg_color: "Custom"
+                    md_bg_color: self.theme_cls.primaryColor
+                    on_release: root.start_analysis(text_field.text)
+                    MDButtonText:
+                        text: "Start Analysis"
+                        theme_text_color: "Custom"
+                        text_color: self.theme_cls.surfaceColor
                         pos_hint: {"center": [.5, .5]}
-                        on_release:
-                            text_field.text = ""
 

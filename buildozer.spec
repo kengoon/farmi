@@ -13,7 +13,7 @@ package.domain = com
 source.dir = .
 
 # (list) Source files to include (let empty to include all the files)
-source.include_exts = py,png,jpg,kv,atlas
+source.include_exts = py,png,jpg,kv,atlas,prompt
 
 # (list) List of inclusions using pattern matching
 #source.include_patterns = assets/*,images/*.png
@@ -156,7 +156,7 @@ android.accept_sdk_license = True
 
 # (str) Extra xml to write directly inside the <manifest><application> tag of AndroidManifest.xml
 # use that parameter to provide a filename from where to load your custom XML arguments:
-#android.extra_manifest_application_arguments = ./src/android/extra_manifest_application_arguments.xml
+#android.extra_manifest_application_arguments = ./manifest/photo_picker.xml
 
 # (str) Full name including package path of the Java class that implements Python Service
 # use that parameter to set custom Java class which extends PythonService
@@ -209,7 +209,8 @@ android.add_resources = res
 android.gradle_dependencies = io.github.simplejnius:sjfirebase:1.3.0,
     com.google.firebase:firebase-auth,androidx.appcompat:appcompat:1.7.0,
     com.google.firebase:firebase-firestore,com.google.guava:guava:32.0.1-android,
-    org.reactivestreams:reactive-streams:1.0.4,com.google.firebase:firebase-vertexai:16.0.0-beta04
+    org.reactivestreams:reactive-streams:1.0.4,com.google.firebase:firebase-vertexai:16.0.0-beta04,
+    com.google.android.gms:play-services-location:21.3.0
 
 # (bool) Enable AndroidX support. Enable when 'android.gradle_dependencies'
 # contains an 'androidx' package, or any package from Kotlin source.
