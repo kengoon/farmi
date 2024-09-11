@@ -88,14 +88,14 @@ class PieChart(ThemableBehavior, BoxLayout):
             self.pos[1] + self.size[1] / 2,
         ]
 
-        for color_item, (title, value) in enumerate(items.items()):
+        for title, value in items.items():
             with self.canvas.before:
 
                 alpha = 0 if self.starting_animation else 1
-                if self.color_mode == "colors":
-                    color = get_color_from_hex(
-                        colors[palette[color_item]]["500"]
-                    )
+                if title == "Healthy Area":
+                    color = self.theme_cls.primaryColor
+                else:
+                    color = self.theme_cls.errorColor
 
                 c = Color(rgb=color, a=alpha)
                 if self.starting_animation:

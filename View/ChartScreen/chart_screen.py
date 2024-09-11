@@ -5,10 +5,9 @@ from kivymd.uix.label import MDLabel, MDIcon
 from kivymd.uix.relativelayout import MDRelativeLayout
 from Components.frame import CoverImage
 from kivy.metrics import sp
-from Components.charts import BarChart
+from Components.charts import BarChart, PieChart
 from kivy.metrics import dp
 from kivymd.uix.divider import MDDivider
-from kivy.clock import triggered
 
 
 class ChartScreenView(BaseScreenView):
@@ -24,7 +23,6 @@ class ChartScreenView(BaseScreenView):
         if self.get_extra("analytical_type") == "crop_analysis":
             self.crop_analysis()
 
-    @triggered(.3)
     def crop_analysis(self):
         data: dict = self.get_extra("analysis")
 
@@ -175,6 +173,35 @@ class ChartScreenView(BaseScreenView):
             )
         )
 
+        analysis_breakdown = data.get("analysis_breakdown")
+        self.ids.sv_list.add_widget(
+            MDCard(
+                MDLabel(
+                    text="Analysis Breakdown",
+                    bold=True,
+                    adaptive_height=True,
+                    theme_line_height="Custom",
+                    line_height=1,
+                ),
+                PieChart(
+                    items=[
+                        {
+                            "Healthy Area": analysis_breakdown["healthy_area"],
+                            "Affected Area": analysis_breakdown["affected_area"]
+                        }
+                    ],
+                    pos_hint={"center_x": 0.5},
+                    size_hint=[None, None],
+                    size=("200dp", "200dp"),
+                ),
+                padding="10dp",
+                spacing="10dp",
+                size_hint_y=None,
+                height="250dp",
+                orientation="vertical"
+            )
+        )
+
         confidence_level = data.get("confidence_level")
         self.ids.sv_list.add_widget(
             MDCard(
@@ -206,6 +233,48 @@ class ChartScreenView(BaseScreenView):
                 adaptive_height=True,
             )
         )
+
+        actionable_suggestions = data.get("actionable_suggestions")
+        card = MDCard(
+            MDLabel(
+                text="Actionable Suggestions",
+                adaptive_height=True,
+                bold=True,
+            ),
+            orientation="vertical",
+            padding="20dp",
+            spacing="15dp",
+            adaptive_height=True
+
+        )
+        for value in actionable_suggestions:
+            card.add_widget(
+                MDBoxLayout(
+                    MDIcon(
+                        icon="circle-medium",
+                        pos_hint={"top": .9},
+                        theme_icon_color="Custom",
+                        icon_color=self.theme_cls.primaryColor,
+                    ),
+                    MDBoxLayout(
+                        MDLabel(
+                            text=value["recommendation"],
+                            adaptive_height=True,
+                        ),
+                        MDLabel(
+                            text="[b]priority:[/b] " + value["priority"],
+                            adaptive_height=True,
+                            markup=True,
+                        ),
+                        orientation="vertical",
+                        spacing="5dp",
+                        adaptive_height=True
+                    ),
+                    spacing="10dp",
+                    adaptive_height=True,
+                )
+            )
+        self.ids.sv_list.add_widget(card)
 
         text_explanation = data.get("text_explanation")
         self.ids.sv_list.add_widget(
