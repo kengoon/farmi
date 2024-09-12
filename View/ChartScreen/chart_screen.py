@@ -20,8 +20,20 @@ class ChartScreenView(BaseScreenView):
         """
 
     def on_enter(self, *args):
-        if self.get_extra("analytical_type") == "crop_analysis":
-            self.crop_analysis()
+        match self.get_extra("analytical_type"):
+            case "crop_analysis":
+                self.crop_analysis()
+            case "crop_prediction":
+                self.crop_prediction()
+
+    def crop_prediction(self):
+        self.ids.sv_list.add_widget(
+            MDLabel(
+                text=self.get_extra("prediction"),
+                adaptive_height=True,
+                markup=True,
+            )
+        )
 
     def crop_analysis(self):
         data: dict = self.get_extra("analysis")

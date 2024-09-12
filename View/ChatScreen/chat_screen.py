@@ -1,6 +1,8 @@
+import re
+
 from kivy.animation import Animation
 from kivy.clock import triggered, mainthread
-from kivy.metrics import dp
+from kivy.metrics import dp, sp
 from kivy.properties import ObjectProperty
 from kivymd.uix.button import MDIconButton
 from kivymd.uix.card import MDCard
@@ -14,7 +16,8 @@ from kivymd.uix.relativelayout import MDRelativeLayout
 from time import time
 from kivymd.uix.behaviors import StencilBehavior
 from libs.tools import get_bitmap
-from os.path import splitext
+from os.path import splitext, join
+from kivymd import fonts_path
 from pickle import loads
 
 
@@ -202,6 +205,10 @@ class ChatScreenView(BaseScreenView):
     def farmi_chat(self, text):
         self.remove_chat_loader()
         text = text.strip()
+        text = re.sub(r'\*\*(.*?)\*\*', r'[b]\1[/b]', text)
+        dot_font = join(fonts_path, "materialdesignicons-webfont.ttf")
+        dot = f"[color=406836ff][font={dot_font}][size={int(sp(20))}]\U000F09DE[/size][/font][/color]"
+        text = text.replace("* ", f"{dot} ")
         card = MDCard(
             MDLabel(
                 adaptive_height=True,
@@ -255,7 +262,7 @@ class ChatScreenView(BaseScreenView):
         from sjgeminifvai.jclass.contentbuilder import ContentBuilder
         from simplejnius.guava.jclass.futures import Futures
         from simplejnius.guava.jinterface.futurecallback import FutureCallback
-        from kvdroid import activity  # noqa
+        from jnius import autoclass
 
         # Provide a prompt that contains text
         content = ContentBuilder()
@@ -276,7 +283,7 @@ class ChatScreenView(BaseScreenView):
                 on_failure=self.get_gemini_error
             )
         )
-        executor = activity.getContext().getMainExecutor()
+        executor = autoclass("java.util.concurrent.Executors").newSingleThreadExecutor()
         Futures.addCallback(self.response, self.future_callback, executor)
 
     @mainthread

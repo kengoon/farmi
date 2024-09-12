@@ -1,13 +1,16 @@
 import contextlib
-
+import re
+from os.path import join
+from pickle import loads
 from kivy.animation import Animation
-from kivy.clock import Clock
-from kivy.metrics import dp
-from kivymd.uix.button import MDIconButton
+from kivy.clock import Clock, mainthread
+from kivy.metrics import dp, sp
 from kivymd.uix.card import MDCard
 from kivymd.uix.label import MDLabel
-
+from kivymd import fonts_path
 from View.base_screen import BaseScreenView
+from libs.decorator import android_only
+from kivymd.uix.snackbar import MDSnackbar, MDSnackbarSupportingText
 
 
 class YieldPredictionScreenView(BaseScreenView):
@@ -66,6 +69,12 @@ class YieldPredictionScreenView(BaseScreenView):
             "The amount of plots of farm land being planted. "
             "While this doesn't directly influence the yield per unit area, "
             "it's necessary to estimate total production."
+        ),
+
+        (
+            "State",
+            "The state in Nigeria your farm land located. "
+            "Different parts of our country have different weather and soil conditions."
         )
     ]
     item_index = 0
@@ -74,6 +83,37 @@ class YieldPredictionScreenView(BaseScreenView):
     def __init__(self, app, **kw):
         super().__init__(app, **kw)
         self.set_radius = False
+        self.future_callback = None
+        self.response = None
+        self.prompt = None
+        self.chat = None
+        self.bitmaps = []
+        self.__android_init__()
+
+    @android_only
+    def __android_init__(self):
+        from sjgeminifvai.jclass.fvai import FirebaseVertexAI
+        from sjgeminifvai.jclass.gmf import GenerativeModelFutures
+        from sjgeminifvai.jclass.optionals import RequestOptions
+        from sjgeminifvai.jclass.contentbuilder import ContentBuilder
+
+        # Initialize the Vertex AI service and the generative model
+        # Specify a model that supports your use case
+        # Gemini 1.5 models are versatile and can be used with all API capabilities
+        vertex = FirebaseVertexAI.getInstance()
+        with open("system_instructions/chat_instruction.prompt", "rb") as model:
+            system_instruction = ContentBuilder().addText(
+                loads(model.read())
+            ).build()
+        self.gm = vertex.generativeModel(
+            "gemini-1.5-flash", None, None, RequestOptions(),
+            None, None, system_instruction
+        )
+
+        # Use the GenerativeModelFutures Java compatibility layer which offers
+        # support for ListenableFuture and Publisher APIs
+        self.model = getattr(GenerativeModelFutures, "from")(self.gm)
+        self.chat = self.model.startChat()
 
     def model_is_changed(self) -> None:
         """
@@ -91,7 +131,8 @@ class YieldPredictionScreenView(BaseScreenView):
         self.farmi_chat()
 
     def farmi_chat(self):
-        if self.item_index > len(self.input_prediction) - 1:
+        if self.item_index >= len(self.input_prediction):
+            self.start_prediction()
             return
         question = self.input_prediction[self.item_index][0] + "?"
         description = self.input_prediction[self.item_index][1]
@@ -113,12 +154,12 @@ class YieldPredictionScreenView(BaseScreenView):
                 md_bg_color=self.theme_cls.surfaceContainerHighColor
             )
         )
-        self.item_index += 1
         self.scroll_bottom()
 
     def user_chat(self, text):
         if not text:
             return
+        text = text.strip()
         question = self.input_prediction[self.item_index][0]
         self.put_extra(question, self.ids.text_field.text)
         card = MDCard(
@@ -148,11 +189,12 @@ class YieldPredictionScreenView(BaseScreenView):
         self.ids.sv_list.add_widget(card)
         self.scroll_bottom()
 
-        if self.item_index == len(self.input_prediction) - 1:
+        if self.item_index == len(self.input_prediction):
             self.start_prediction()
             return 
 
         Clock.schedule_once(lambda _: self.farmi_chat(), 1)
+        self.item_index += 1
 
     def scroll_bottom(self):
         sv = self.ids.sv
@@ -196,3 +238,63 @@ class YieldPredictionScreenView(BaseScreenView):
             text = self.get_extra(item[0], "")
             self.ids.text_field.text = text
             self.prev_item_index = self.item_index
+
+    @android_only
+    def start_prediction(self):
+        self.open_dialog()
+        from sjgeminifvai.jclass.contentbuilder import ContentBuilder
+        from simplejnius.guava.jclass.futures import Futures
+        from simplejnius.guava.jinterface.futurecallback import FutureCallback
+        from jnius import autoclass
+
+        text = ""
+        for question, _ in self.input_prediction:
+            text += f"{question}: {self.get_extra(question)}\n"
+        text = text.strip()
+
+        # Provide a prompt that contains text
+        content = ContentBuilder()
+        content.setRole("user")
+        content.addText(text)
+        self.prompt = content.build()
+
+        # To generate text output, call generateContent with the text input
+        self.response = self.chat.sendMessage(self.prompt)
+
+        self.future_callback = FutureCallback(
+            dict(
+                on_success=self.get_gemini_reply,
+                on_failure=self.get_gemini_error
+            )
+        )
+        executor = autoclass("java.util.concurrent.Executors").newSingleThreadExecutor()
+        Futures.addCallback(self.response, self.future_callback, executor)
+
+    @mainthread
+    def get_gemini_reply(self, result):
+        text = result.getText()
+        text = text.strip()
+        text = re.sub(r'\*\*(.*?)\*\*', r'[b]\1[/b]', text)
+        text = re.sub(r'(?<!\*)\*(?!\*)(.*?)\*(?<!\*)', r'[i]\1[/i]', text)
+        dot_font = join(fonts_path, "materialdesignicons-webfont.ttf")
+        dot = f"[color=406836ff][font={dot_font}][size={int(sp(20))}]\U000F09DE[/size][/font][/color]"
+        text = text.replace("* ", f"{dot} ")
+        self.put_extra("analytical_type", "crop_prediction")
+        self.put_extra("prediction", text)
+        self.switch_screen("chart screen")
+        self.ids.sv_list.clear_widgets()
+        self.item_index = 0
+
+    @mainthread
+    def get_gemini_error(self, error):
+        print(error.getLocalizedMessage())
+        text = f"Something unexpected happened"
+        MDSnackbar(
+            MDSnackbarSupportingText(
+                text=text,
+            ),
+            y=dp(24),
+            pos_hint={"center_x": 0.5},
+            size_hint_x=0.9,
+        ).open()
+        self.dismiss_dialog()
