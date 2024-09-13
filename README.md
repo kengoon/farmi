@@ -37,4 +37,12 @@ Email: kengoon19@gmail.com
 - Integrated Backend Infrastructures
 - Full-stack developer
 
+![Screenshot_2024-09-09-18-57-12-831_com farmi](https://github.com/user-attachments/assets/e971255b-7520-4d07-9b36-6a8b98226cbc)
+![Screenshot_2024-09-09-19-47-15-704_com farmi](https://github.com/user-attachments/assets/dcc09052-820e-4c70-b397-2915667639c8)
+![Screenshot_2024-09-09-19-49-09-533_com farmi](https://github.com/user-attachments/assets/4f8909c4-1c2a-4c02-9661-8071efac2771)
+![Screenshot_2024-09-09-19-47-29-320_com farmi](https://github.com/user-attachments/assets/87b26dca-93b9-4691-9f41-b5c5c77d52a9)
+![Screenshot_2024-09-11-22-45-29-859_com farmi](https://github.com/user-attachments/assets/79109b31-72e6-4586-8de5-2b9082cfecd3)
+![Screenshot_2024-09-11-22-45-26-489_com farmi](https://github.com/user-attachments/assets/b74192f3-57fd-4074-8d99-7f880715e181)
+![Screenshot_2024-09-11-22-45-19-178_com farmi](https://github.com/user-attachments/assets/640ff939-909c-40fd-90a6-113096156753)
+
 
