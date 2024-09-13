@@ -77,7 +77,7 @@ class YieldPredictionScreenView(BaseScreenView):
             "Different parts of our country have different weather and soil conditions."
         )
     ]
-    item_index = 0
+    item_index = None
     prev_item_index = 0
 
     def __init__(self, app, **kw):
@@ -123,11 +123,12 @@ class YieldPredictionScreenView(BaseScreenView):
         """
 
     def on_enter(self):
-        if self.item_index > 0:
+        if self.item_index is not None:
             return
         if not self.set_radius:
             self.ids.text_field.radius = self.ids.text_field.height / 2
             self.set_radius = True
+        self.item_index = 0
         self.farmi_chat()
 
     def farmi_chat(self):
@@ -283,7 +284,7 @@ class YieldPredictionScreenView(BaseScreenView):
         self.put_extra("prediction", text)
         self.switch_screen("chart screen")
         self.ids.sv_list.clear_widgets()
-        self.item_index = 0
+        self.item_index = None
 
     @mainthread
     def get_gemini_error(self, error):
