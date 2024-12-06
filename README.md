@@ -26,14 +26,3 @@ With a focus on simplicity, practicality, and cultural relevance, **Farmi AI** s
 transforming Nigerian agriculture, bringing advanced technology to the hands of farmers to help them thrive in
 a rapidly changing agricultural landscape.
 
-### Team
-
-Name: Kenechukwu Akubue (Software Engineer)
-
-Email: kengoon19@gmail.com
-
-**Contribution:**
-- Built mobile app
-- Fine-tuned AI prompts and models
-- Integrated Backend Infrastructures
-- Full-stack developer
